@@ -139,7 +139,19 @@ export default function Cart() {
                               <input
                                 type="number"
                                 value={item.quantity}
-                                onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  // اگر خالی بود، هیچ کاری نکن (تا کاربر تایپ کند)
+                                  if (val === '') return;
+                                  updateQuantity(item.id, Number(val));
+                                }}
+                                onBlur={(e) => {
+                                  // اگر خالی ماند، به ۱ برگردان
+                                  if (!e.target.value || Number(e.target.value) < 1) {
+                                    updateQuantity(item.id, 1);
+                                  }
+                                }}
+                                min="1"
                                 className="w-22 h-22 font-bold d-block bg-transparent outline-none border-0 text-center"
                                 style={{ width: 40 }}
                               />

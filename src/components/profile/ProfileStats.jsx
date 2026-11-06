@@ -1,12 +1,7 @@
 // src/components/profile/ProfileStats.jsx
-import { useNavigate } from 'react-router-dom'; // اگر از react-router استفاده می‌کنید
 import { Link } from 'react-router-dom';
-
-const stats = [
-  { id: 1, value: '123', label: 'سفارش تکمیل شده', icon: 'done', active: true, link: '/profile/orders?status=completed' },
-  { id: 2, value: '9', label: 'سفارش در حال پردازش', icon: 'processing', link: '/profile/orders?status=processing' },
-  { id: 3, value: '2', label: 'تخفیف ویژه محصولات', icon: 'discount', link: '/profile/discounts' },
-];
+import { useMemo } from 'react';
+import { useOrders } from '../../context/OrderContext';
 
 function StatIcon({ name }) {
   const icons = {
@@ -53,11 +48,9 @@ function StatIcon({ name }) {
       </svg>
     ),
   };
-
   return icons[name] || null;
 }
 
-// آیکون سه‌نقطه‌ای که در طرح اصلی کنار هر کارت بود
 function DotsIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="4" height="16" viewBox="0 0 4 16" fill="none">
@@ -73,66 +66,90 @@ function DotsIcon() {
   );
 }
 
-/**
- * کارت‌های آماری پروفایل کاربر
- * @param {Object} props
- * @param {Array}  props.data        - داده‌های آماری (اختیاری؛ پیش‌فرض stats)
- * @param {Function} props.onCardClick - کالبک کلیک روی کارت (اختیاری)
- * @param {string} props.className   - کلاس اضافی برای کانتینر
- */
+export default function ProfileStats() {
+  const { orders } = useOrders();
 
-const defaultStats = [
-  { id: 1, value: '۱۲۳', label: 'سفارش تکمیل شده', icon: 'done', active: true, href: '/orders' },
-  { id: 2, value: '۹', label: 'سفارش در حال پردازش', icon: 'processing', href: '/orders' },
-  { id: 3, value: '۲', label: 'تخفیف ویژه محصولات', icon: 'discount', href: '/products' },
-];
+  // محاسبه آمار از سفارشات واقعی
+  const stats = useMemo(() => {
+    const completed = orders.filter(
+      (o) => o.status === 'تکمیل شده' || o.status === 'تحویل داده شده'
+    ).length;
 
-export default function ProfileStats({ data = defaultStats, className = '', handleClick }) {
+    const processing = orders.filter(
+      (o) =>
+        o.status === 'در حال پردازش' ||
+        o.status === 'در حال ارسال' ||
+        !o.status
+    ).length;
+
+    // «تخفیف ویژه» فعلاً ثابت است، چون منبع داده‌ای برای آن نداریم
+    const discounts = 2;
+
+    return { completed, processing, discounts, total: orders.length };
+  }, [orders]);
+
+  const cards = [
+    {
+      id: 1,
+      value: stats.completed.toLocaleString('fa-IR'),
+      label: 'سفارش تکمیل شده',
+      icon: 'done',
+      active: true,
+      href: '/orders',
+    },
+    {
+      id: 2,
+      value: stats.processing.toLocaleString('fa-IR'),
+      label: 'سفارش در حال پردازش',
+      icon: 'processing',
+      href: '/orders',
+    },
+    {
+      id: 3,
+      value: stats.discounts.toLocaleString('fa-IR'),
+      label: 'تخفیف ویژه محصولات',
+      icon: 'discount',
+      href: '/products',
+    },
+  ];
+
+  // حالت خالی: اگر هیچ سفارشی نیست، پیام مناسب نشان بده
+  if (orders.length === 0) {
+    return (
+      <div className="rounded-20 p-4 bg-white shadow2 text-center">
+        <p className="fs-16 font-bold mb-2">هنوز سفارشی ثبت نکرده‌اید</p>
+        <p className="fs-14 text-gray mb-3">
+          با ثبت اولین سفارش، آمار شما اینجا نمایش داده می‌شود
+        </p>
+        <Link
+          to="/products"
+          className="d-inline-flex align-items-center justify-content-center gap-2 rounded-14 bg-gradient-main py-2 px-4 text-decoration-none"
+        >
+          <p className="mb-0 fw-bold text-white fs-14">مشاهده محصولات</p>
+        </Link>
+      </div>
+    );
+  }
+
   return (
-    <div className={`d-flex flex-column flex-md-row align-items-center justify-content-between gap-4 ${className}`}>
-      {data.map((item) => {
-        const cardContent = (
-          <>
-            <div className="d-flex justify-content-between">
-              <StatIcon name={item.icon} />
-              <DotsIcon />
-            </div>
-            <p className="fs-24 font-bold text-dark mb-0 mt-3">{item.value}</p>
-            <p className="text-gray mb-0">{item.label}</p>
-          </>
-        );
-
-        const cardClass = `d-block flex-grow-1 w-100 rounded-20 p-4 dashboardSat shadow2 bg-white ${item.active ? 'active' : ''
-          }`;
-
-        // اگه href داره → Link
-        if (item.href) {
-          return (
-            <Link
-              key={item.id}
-              to={item.href}
-              className={cardClass}
-              style={{ cursor: 'pointer' }}
-              onClick={handleClick ? () => handleClick(item) : undefined}
-            >
-              {cardContent}
-            </Link>
-          );
-        }
-
-        // وگرنه → div کلیک‌پذیر
-        return (
-          <div
-            key={item.id}
-            className={cardClass}
-            style={{ cursor: 'pointer' }}
-            onClick={handleClick ? () => handleClick(item) : undefined}
-            role="button"
-          >
-            {cardContent}
+    <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
+      {cards.map((item) => (
+        <Link
+          key={item.id}
+          to={item.href}
+          className={`d-block flex-grow-1 w-100 rounded-20 p-4 dashboardSat shadow2 bg-white ${
+            item.active ? 'active' : ''
+          }`}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className="d-flex justify-content-between">
+            <StatIcon name={item.icon} />
+            <DotsIcon />
           </div>
-        );
-      })}
+          <p className="fs-24 font-bold text-dark mb-0 mt-3">{item.value}</p>
+          <p className="text-gray mb-0">{item.label}</p>
+        </Link>
+      ))}
     </div>
   );
 }

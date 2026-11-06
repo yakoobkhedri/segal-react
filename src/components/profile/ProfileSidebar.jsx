@@ -1,5 +1,6 @@
 // src/components/profile/ProfileSidebar.jsx
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const menuItems = [
   { icon: 'dashboard', label: 'پیشخوان کاربری', href: '/profile' },
@@ -58,6 +59,7 @@ function MenuIcon({ name }) {
 
 export default function ProfileSidebar() {
   const location = useLocation();
+  const { user } = useAuth();
 
   return (
     <div className="w-362 mt-5">
@@ -70,12 +72,18 @@ export default function ProfileSidebar() {
           </div>
           <div className="position-absolute end-0 start-0 top-0 mx-4 -mt-12">
             <div className="rounded-circle w-76 h-76 border-second-5 mx-auto -top-33 position-relative">
-              <img alt="avatar" src="/assets/img/avatar.png" className="img-fluid rounded-circle w-100 h-100" />
+              {user?.avatar ? (
+                <img alt="avatar" src={user.avatar} className="img-fluid rounded-circle w-100 h-100" />
+              ) : (
+                <div className="w-100 h-100 rounded-circle bg-gradient-main d-flex align-items-center justify-content-center">
+                  <span className="fs-24 font-bold text-white">{user?.name?.charAt(0) || '؟'}</span>
+                </div>
+              )}
             </div>
             <div className="d-flex align-items-center justify-content-between">
               <div>
-                <p className="mb-0 font-bold text-white">عطا حیدری</p>
-                <p className="fs-12 text-white-50 mb-0">۰۹۱۲۳۴۵۶۷۸۹</p>
+                <p className="mb-0 font-bold text-white">{user?.name || 'کاربر'}</p>
+                <p className="fs-12 text-white-50 mb-0">{user?.phone || '—'}</p>
               </div>
               <div className="d-flex align-items-center justify-content-center gap-3 bg-white rounded-pill w-84 h-32">
                 <a className="d-block">

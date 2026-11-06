@@ -1,13 +1,14 @@
 // src/components/profile/ProfileCartPreview.jsx
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-
+import { useAuth } from '../../context/AuthContext';
+import { useAddresses } from '../../context/AddressContext';
 function formatPrice(num) {
   if (!num || num === 0) return '۰';
   return num.toLocaleString('fa-IR');
 }
 
-// آیکون سبد خرید (برای دکمه تسویه)
 function CartIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -28,7 +29,6 @@ function CartIcon() {
   );
 }
 
-// آیکون مکان (برای تغییر آدرس)
 function LocationIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -42,7 +42,6 @@ function LocationIcon() {
   );
 }
 
-// یه آیتم سبد
 function CartItem({ item }) {
   const discount =
     item.oldPrice > item.price
@@ -79,7 +78,6 @@ function CartItem({ item }) {
       </div>
 
       <div className="d-flex justify-content-between flex-column">
-        {/* تعداد */}
         <div className="d-flex align-items-center justify-content-end gap-2">
           <span className="w-22 h-22 d-flex align-items-center justify-content-center bg-white border rounded-3 fs-14">
             {item.quantity}
@@ -87,7 +85,6 @@ function CartItem({ item }) {
           <span className="fs-13 text-gray">عدد</span>
         </div>
 
-        {/* قیمت */}
         <div className="d-flex align-items-center justify-content-end justify-content-md-start mt-3 mt-md-0 gap-1">
           {discount > 0 && (
             <div className="d-flex align-items-center gap-2">
@@ -113,9 +110,9 @@ function CartItem({ item }) {
 
 export default function ProfileCartPreview() {
   const { cart, totalPrice } = useCart();
+  const { user } = useAuth();
 
-  // آدرس نمونه (بعداً از بک‌اند میاد)
-  const defaultAddress = 'تهران، شریعتی، نبش کودکان غزه، پلاک ۵۰ - عطا حیدری';
+  const { defaultAddress } = useAddresses();
 
   return (
     <div className="rounded-22 px-4 py-3 bg-white shadow2 mt-4">
@@ -174,14 +171,22 @@ export default function ProfileCartPreview() {
         <div className="d-flex flex-wrap gap-3 gap-lg-0 align-items-center justify-content-between mt-2">
           <div className="d-flex flex-wrap gap-3 gap-lg-1 align-items-center fs-14">
             <p className="mb-0 fw-bold">آدرس ارسال:</p>
-            <p className="mb-0">{defaultAddress}</p>
+            {defaultAddress ? (
+              <p className="mb-0">{defaultAddress.fullAddress}</p>
+            ) : (
+              <p className="mb-0 text-gray">
+                {user?.name ? `${user.name}، آدرسی ثبت نشده` : 'آدرسی ثبت نشده'}
+              </p>
+            )}
           </div>
           <Link
             to="/profile/addresses"
             className="d-flex align-items-center gap-1 text-decoration-none"
           >
             <LocationIcon />
-            <p className="mb-0 text-gray fs-14">تغییر آدرس</p>
+            <p className="mb-0 text-gray fs-14">
+              {defaultAddress ? 'تغییر آدرس' : 'افزودن آدرس'}
+            </p>
           </Link>
         </div>
 

@@ -1,84 +1,152 @@
 // src/context/CartContext.jsx
-import { createContext, useContext, useState, useEffect } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 
 const CartContext = createContext();
 
+const STORAGE_KEY = 'segal-cart';
+
+// ✅ اعتبارسنجی و نرمال‌سازی quantity
+const normalizeQuantity = (qty) => {
+  const n = Math.floor(Number(qty));
+  if (!Number.isFinite(n) || n < 1) return 1;
+  return n;
+};
+
+// ✅ نرمال‌سازی آیتم‌های سبد از localStorage
+const normalizeCart = (rawCart) => {
+  if (!Array.isArray(rawCart)) return [];
+  return rawCart
+    .filter((item) => item && item.id != null)
+    .map((item) => ({
+      ...item,
+      quantity: normalizeQuantity(item.quantity),
+      price: Number(item.price) || 0,
+    }));
+};
+
 export function CartProvider({ children }) {
   const [cart, setCart] = useState(() => {
-    // بازیابی سبد از localStorage
     try {
-      const saved = localStorage.getItem('segal-cart');
-      return saved ? JSON.parse(saved) : [];
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? normalizeCart(JSON.parse(saved)) : [];
     } catch {
       return [];
     }
   });
 
-  // ذخیره در localStorage هر بار که تغییر کرد
+  // ✅ ذخیره در localStorage با try/catch
   useEffect(() => {
-    localStorage.setItem('segal-cart', JSON.stringify(cart));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+    } catch (e) {
+      console.warn('ذخیره سبد خرید ناموفق بود', e);
+    }
   }, [cart]);
 
-  // افزودن محصول
-  const addToCart = (product) => {
+  // ✅ همگام‌سازی بین تب‌ها با storage event
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key !== STORAGE_KEY) return;
+      try {
+        const newCart = e.newValue ? JSON.parse(e.newValue) : [];
+        setCart(normalizeCart(newCart));
+      } catch {
+        // نادیده بگیر
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  // ✅ افزودن محصول (با اعتبارسنجی)
+  // در CartContext، addToCart را این‌طور کنید:
+  const addToCart = useCallback((product) => {
+    if (!product || product.id == null) return;
+    const addQty = normalizeQuantity(product.quantity) || 1;
+
     setCart((prev) => {
       const exists = prev.find((item) => item.id === product.id);
       if (exists) {
         return prev.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: normalizeQuantity(item.quantity) + addQty }
             : item
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [
+        ...prev,
+        {
+          ...product,
+          quantity: addQty,
+          price: Number(product.price) || 0,
+        },
+      ];
     });
-  };
+  }, []);
 
-  // حذف محصول
-  const removeFromCart = (id) => {
+  // ✅ حذف محصول
+  const removeFromCart = useCallback((id) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
-  };
+  }, []);
 
-  // تغییر تعداد
-  const updateQuantity = (id, quantity) => {
-    if (quantity <= 0) {
-      removeFromCart(id);
+  // ✅ تغییر تعداد (با اعتبارسنجی کامل)
+  const updateQuantity = useCallback((id, quantity) => {
+    const q = Math.floor(Number(quantity));
+
+    // اگر نامعتبر یا صفر بود → حذف
+    if (!Number.isFinite(q) || q <= 0) {
+      setCart((prev) => prev.filter((item) => item.id !== id));
       return;
     }
+
     setCart((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity } : item
-      )
+      prev.map((item) => (item.id === id ? { ...item, quantity: q } : item))
     );
-  };
+  }, []);
 
-  // خالی کردن سبد
-  const clearCart = () => setCart([]);
+  // ✅ خالی کردن سبد
+  const clearCart = useCallback(() => setCart([]), []);
 
-  // تعداد کل آیتم‌ها
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  // قیمت کل
-  const totalPrice = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
+  // ✅ محاسبه totalItems با useMemo
+  const totalItems = useMemo(
+    () => cart.reduce((sum, item) => sum + normalizeQuantity(item.quantity), 0),
+    [cart]
   );
 
-  return (
-    <CartContext.Provider
-      value={{
-        cart,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        totalItems,
-        totalPrice,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+  // ✅ محاسبه totalPrice با useMemo
+  const totalPrice = useMemo(
+    () =>
+      cart.reduce(
+        (sum, item) =>
+          sum + (Number(item.price) || 0) * normalizeQuantity(item.quantity),
+        0
+      ),
+    [cart]
   );
+
+  // ✅ پایدار کردن value
+  const value = useMemo(
+    () => ({
+      cart,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      totalItems,
+      totalPrice,
+      itemCount: cart.length, // تعداد ردیف‌ها (نه تعداد کل)
+    }),
+    [cart, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice]
+  );
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export const useCart = () => {

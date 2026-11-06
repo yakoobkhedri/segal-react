@@ -1,11 +1,21 @@
 // src/pages/Login.jsx
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 
+// کدهای ثابت برای دمو (در پروژه واقعی از بک‌اند می‌آید)
+const DEMO_OTP = '12345';
+const DEMO_SECURE_CODE = '858569';
+
+// تبدیل ارقام فارسی/عربی به لاتین
+const toEnglishDigits = (str) =>
+  String(str)
+    .replace(/[۰-۹]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+    .replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+
 export default function Login() {
-  const { login } = useAuth();        // 👈 اضافه کن
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/profile';
@@ -13,35 +23,57 @@ export default function Login() {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '']);
   const [secureCode, setSecureCode] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
   const inputRefs = useRef([]);
   const { showToast } = useToast();
+  const toastShownRef = useRef(false);
 
+  // Toast «برای دسترسی باید وارد شوی» فقط یک بار در StrictMode
   useEffect(() => {
-    if (location.state?.from) {
+    if (location.state?.from && !toastShownRef.current) {
+      toastShownRef.current = true;
       showToast('برای دسترسی به این صفحه باید وارد شوی', 'info');
     }
-  }, []);
+  }, [location.state?.from, showToast]);
+
+  // تایمر ارسال مجدد
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const timer = setTimeout(() => setResendTimer((t) => t - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendTimer]);
 
   // مرحله ۱: ارسال موبایل
   const handleSendPhone = (e) => {
     e.preventDefault();
-    if (phone.length < 10) {
-      showToast('لطفا شماره موبایل معتبر وارد کنید', 'error');
+    const cleanPhone = toEnglishDigits(phone).replace(/\D/g, '');
+
+    if (!/^09\d{9}$/.test(cleanPhone)) {
+      showToast('شماره موبایل باید با ۰۹ شروع شود و ۱۱ رقم باشد', 'error');
       return;
     }
+
+    setPhone(cleanPhone);
     setStep('otp');
-    showToast('کد تایید برای شما ارسال شد', 'info');
+    setResendTimer(30);
+    showToast('کد تایید برای شما ارسال شد (کد دمو: 12345)', 'info');
   };
 
   // تغییر OTP
   const handleOtpChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return;
+    const cleanValue = toEnglishDigits(value).replace(/\D/g, '');
+    if (!cleanValue) {
+      const newOtp = [...otp];
+      newOtp[index] = '';
+      setOtp(newOtp);
+      return;
+    }
+
     const newOtp = [...otp];
-    newOtp[index] = value.slice(-1);
+    newOtp[index] = cleanValue.slice(-1);
     setOtp(newOtp);
 
-    // برو به input بعدی
-    if (value && index < 4) {
+    if (index < 4) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -53,22 +85,65 @@ export default function Login() {
     }
   };
 
-  // مرحله ۲: تایید OTP
+  // Paste کد ۵ رقمی
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasted = toEnglishDigits(e.clipboardData.getData('text'))
+      .replace(/\D/g, '')
+      .slice(0, 5);
+    if (!pasted) return;
+
+    const newOtp = pasted.split('').concat(['', '', '', '', '']).slice(0, 5);
+    setOtp(newOtp);
+    const nextIndex = Math.min(pasted.length, 4);
+    inputRefs.current[nextIndex]?.focus();
+  };
+
+  // ارسال مجدد
+  const handleResend = () => {
+    if (resendTimer > 0) return;
+    setResendTimer(30);
+    showToast('کد تایید مجدداً ارسال شد (کد دمو: 12345)', 'info');
+  };
+
+  // ویرایش شماره
+  const handleEditPhone = () => {
+    setStep('phone');
+    setOtp(['', '', '', '', '']);
+    setSecureCode('');
+    setResendTimer(0);
+  };
+
+  // مرحله ۲: تایید OTP و کد امنیتی
   const handleVerifyOtp = (e) => {
     e.preventDefault();
-    const code = otp.join('');
+    const code = toEnglishDigits(otp.join(''));
+
     if (code.length < 5) {
       showToast('لطفا کد ۵ رقمی را کامل وارد کنید', 'error');
       return;
     }
-    if (secureCode.length === 0) {
+
+    if (code !== DEMO_OTP) {
+      showToast('کد تایید اشتباه است (کد دمو: 12345)', 'error');
+      return;
+    }
+
+    const cleanSecure = toEnglishDigits(secureCode).trim();
+
+    if (cleanSecure.length === 0) {
       showToast('لطفا کد امنیتی را وارد کنید', 'error');
+      return;
+    }
+
+    if (cleanSecure !== DEMO_SECURE_CODE) {
+      showToast('کد امنیتی اشتباه است', 'error');
       return;
     }
 
     login({ name: 'کاربر سگال', phone, email: 'user@segal.com' });
     showToast('ورود موفق! خوش آمدید', 'success');
-    navigate(from, { replace: true });   // 👈 به جای '/profile'
+    navigate(from, { replace: true });
   };
 
   return (
@@ -111,7 +186,7 @@ export default function Login() {
           {/* فرم */}
           <form
             onSubmit={step === 'phone' ? handleSendPhone : handleVerifyOtp}
-            className="bg-white rounded-33 p-4 px-3 px-lg-4 mt-5 position-relative"
+            className="bg-white rounded-33 p-4 px-3 px-lg-4 mt-5 position-relative z-10"
           >
             <img
               alt="shape"
@@ -136,9 +211,9 @@ export default function Login() {
                 <input
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 11))}
+                  onChange={(e) => setPhone(toEnglishDigits(e.target.value).replace(/\D/g, '').slice(0, 11))}
                   disabled={step === 'otp'}
-                  placeholder="شماره تماس"
+                  placeholder="۰۹۱۲۳۴۵۶۷۸۹"
                   className="flex-grow-1 bg-transparent w-100 border-0 outline-none fs-13"
                   dir="ltr"
                 />
@@ -153,6 +228,16 @@ export default function Login() {
                   </g>
                 </svg>
               </div>
+
+              {step === 'otp' && (
+                <button
+                  type="button"
+                  onClick={handleEditPhone}
+                  className="fs-12 text-main border-0 bg-transparent p-0 mt-2 position-relative z-10"
+                >
+                  ✏️ ویرایش شماره
+                </button>
+              )}
             </div>
 
             {step === 'phone' ? (
@@ -167,6 +252,7 @@ export default function Login() {
               <>
                 {/* مرحله ۲: کد ۵ رقمی */}
                 <p className="font-bold text-center mt-lg-5 pt-5">لطفا کد ۵ رقمی ارسال شده را وارد کنید</p>
+                <p className="fs-12 text-gray text-center mb-0">کد دمو: 12345</p>
 
                 <div className="otpContainer d-flex align-items-center gap-sm-4 gap-2 justify-content-between mt-4 pt-1 position-relative z-10" dir="ltr">
                   {otp.map((digit, index) => (
@@ -178,10 +264,28 @@ export default function Login() {
                       value={digit}
                       onChange={(e) => handleOtpChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
+                      onPaste={index === 0 ? handlePaste : undefined}
                       className="otpInput bg-gray2 text-center rounded-12 outline-none border-0 w-100 h-49"
                       style={{ fontSize: 20, fontWeight: 700 }}
                     />
                   ))}
+                </div>
+
+                {/* ارسال مجدد */}
+                <div className="d-flex align-items-center justify-content-center gap-2 mt-3 position-relative z-10">
+                  {resendTimer > 0 ? (
+                    <p className="fs-12 text-gray mb-0">
+                      ارسال مجدد تا {resendTimer} ثانیه دیگر
+                    </p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      className="fs-12 text-main border-0 bg-transparent p-0 fw-bold"
+                    >
+                      ارسال مجدد کد
+                    </button>
+                  )}
                 </div>
 
                 {/* کد امنیتی */}
@@ -192,7 +296,7 @@ export default function Login() {
                   <div className="bg-gray2 rounded-12 p-3 d-flex align-items-center gap-2 z-10 position-relative flex-grow-1 h-49">
                     <input
                       value={secureCode}
-                      onChange={(e) => setSecureCode(e.target.value)}
+                      onChange={(e) => setSecureCode(toEnglishDigits(e.target.value))}
                       placeholder="کد امنیتی"
                       className="flex-grow-1 bg-transparent w-100 border-0 outline-none fs-13"
                       dir="ltr"

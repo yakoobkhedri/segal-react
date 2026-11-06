@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useOrders } from '../context/OrderContext';
+import { useAddresses } from '../context/AddressContext';
 
 function formatPrice(num) {
   if (!num || num === 0) return '۰';
@@ -14,16 +16,19 @@ export default function Checkout() {
   const { cart, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { addOrder } = useOrders();
   const navigate = useNavigate();
+  const { defaultAddress } = useAddresses();
 
   const [step, setStep] = useState(1); // 1: آدرس، 2: پرداخت، 3: موفق
+  const [finalAmount, setFinalAmount] = useState(0); // 👈 مبلغ نهایی قبل از clearCart
   const [form, setForm] = useState({
-    fullName: user?.name || '',
-    phone: user?.phone || '',
-    province: 'تهران',
-    city: 'تهران',
-    address: '',
-    postalCode: '',
+    fullName: defaultAddress?.receiver || user?.name || '',
+    phone: defaultAddress?.phone || user?.phone || '',
+    province: defaultAddress?.province || 'تهران',
+    city: defaultAddress?.city || 'تهران',
+    address: defaultAddress?.fullAddress?.split(' - کدپستی')[0] || '',
+    postalCode: defaultAddress?.postalCode || '',
     paymentMethod: 'zarinpal',
   });
 
@@ -48,6 +53,33 @@ export default function Checkout() {
       showToast('سبد خرید خالی است', 'error');
       return;
     }
+
+    // ۱. ذخیره مبلغ نهایی (قبل از پاک شدن سبد)
+    setFinalAmount(totalPrice);
+
+    // ۲. ساخت آبجکت سفارش
+    const newOrder = {
+      orderNumber: String(orderNumber),
+      date: new Date().toLocaleDateString('fa-IR'),
+      status: 'در حال پردازش',
+      products: cart.map(({ id, title, image, price, oldPrice, quantity, brand, category, color }) => ({
+        id, title, image, price, oldPrice, quantity, brand, category, color,
+      })),
+      address: `${form.province}، ${form.city}، ${form.address} - کدپستی: ${form.postalCode}`,
+      receiver: form.fullName,
+      phone: form.phone,
+      paymentMethod: form.paymentMethod,
+      productCost: totalPrice,
+      shippingCost: 0,
+      totalCost: totalPrice,
+      shippingProgress: 25,
+      shippingStatus: 'در حال پردازش',
+    };
+
+    // ۳. ذخیره سفارش در OrderContext
+    addOrder(newOrder);
+
+    // ۴. رفتن به صفحه موفقیت و پاک کردن سبد
     setStep(3);
     clearCart();
     showToast('سفارش با موفقیت ثبت شد', 'success');
@@ -94,6 +126,9 @@ export default function Checkout() {
             <p className="fs-14 text-gray mb-2">
               شماره سفارش: <span className="font-bold text-main">#{orderNumber}</span>
             </p>
+            <p className="fs-14 mb-4">
+              مبلغ: <span className="font-bold text-main">{formatPrice(finalAmount)}</span> تومان
+            </p>
             <p className="fs-14 text-gray mb-4">
               همکاران ما به زودی برای هماهنگی با شما تماس می‌گیرند.
             </p>
@@ -125,9 +160,8 @@ export default function Checkout() {
           <div className="d-flex align-items-center justify-content-center gap-3 mb-4">
             <div className={`d-flex align-items-center gap-2 ${step >= 1 ? 'text-main' : 'text-gray'}`}>
               <span
-                className={`rounded-circle d-flex align-items-center justify-content-center ${
-                  step >= 1 ? 'bg-gradient-main text-white' : 'bg-gray5 text-gray'
-                }`}
+                className={`rounded-circle d-flex align-items-center justify-content-center ${step >= 1 ? 'bg-gradient-main text-white' : 'bg-gray5 text-gray'
+                  }`}
                 style={{ width: 32, height: 32 }}
               >
                 ۱
@@ -137,9 +171,8 @@ export default function Checkout() {
             <div className="bg-gray4" style={{ width: 60, height: 2 }}></div>
             <div className={`d-flex align-items-center gap-2 ${step >= 2 ? 'text-main' : 'text-gray'}`}>
               <span
-                className={`rounded-circle d-flex align-items-center justify-content-center ${
-                  step >= 2 ? 'bg-gradient-main text-white' : 'bg-gray5 text-gray'
-                }`}
+                className={`rounded-circle d-flex align-items-center justify-content-center ${step >= 2 ? 'bg-gradient-main text-white' : 'bg-gray5 text-gray'
+                  }`}
                 style={{ width: 32, height: 32 }}
               >
                 ۲
@@ -154,6 +187,27 @@ export default function Checkout() {
               {step === 1 && (
                 <div className="bg-white rounded-21 shadow10 p-4">
                   <h3 className="font-bold fs-18 mb-4">آدرس دریافت</h3>
+                  {defaultAddress && (
+                    <div className="bg-second3 rounded-14 p-3 mb-3 fs-13">
+                      <p className="mb-1 fw-bold">آدرس پیش‌فرض:</p>
+                      <p className="mb-2 text-gray">{defaultAddress.fullAddress}</p>
+                      <button
+                        type="button"
+                        onClick={() => setForm({
+                          ...form,
+                          fullName: defaultAddress.receiver,
+                          phone: defaultAddress.phone,
+                          province: defaultAddress.province,
+                          city: defaultAddress.city,
+                          address: defaultAddress.fullAddress.split(' - کدپستی')[0],
+                          postalCode: defaultAddress.postalCode,
+                        })}
+                        className="fs-12 text-main border-0 bg-transparent p-0 fw-bold"
+                      >
+                        پر کردن فرم با این آدرس
+                      </button>
+                    </div>
+                  )}
                   <form onSubmit={handleAddressSubmit}>
                     <div className="row g-3">
                       <div className="col-md-6">
@@ -259,9 +313,8 @@ export default function Checkout() {
                       ].map((method) => (
                         <label
                           key={method.id}
-                          className={`d-flex align-items-center gap-3 border rounded-14 p-3 cursor-pointer ${
-                            form.paymentMethod === method.id ? 'border-main bg-second3' : ''
-                          }`}
+                          className={`d-flex align-items-center gap-3 border rounded-14 p-3 cursor-pointer ${form.paymentMethod === method.id ? 'border-main bg-second3' : ''
+                            }`}
                           style={{ cursor: 'pointer' }}
                         >
                           <input

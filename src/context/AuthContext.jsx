@@ -1,5 +1,5 @@
 // src/context/AuthContext.jsx
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 const AuthContext = createContext();
 
@@ -13,38 +13,54 @@ export function AuthProvider({ children }) {
     }
   });
 
+  // ذخیره در localStorage
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('segal-user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('segal-user');
+    try {
+      if (user) {
+        localStorage.setItem('segal-user', JSON.stringify(user));
+      } else {
+        localStorage.removeItem('segal-user');
+      }
+    } catch (e) {
+      console.warn('ذخیره کاربر ناموفق بود', e);
     }
   }, [user]);
 
   // ورود
-  const login = (userData) => {
+  const login = useCallback((userData) => {
     setUser({
       id: userData.id || Date.now(),
       name: userData.name || 'کاربر',
       phone: userData.phone || '',
       email: userData.email || '',
+      nationalCode: userData.nationalCode || '',
+      address: userData.address || '',
       isLoggedIn: true,
     });
-  };
+  }, []);
 
   // خروج
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
-  };
+  }, []);
+
+  // به‌روزرسانی اطلاعات کاربر (جدید)
+  const updateUser = useCallback((updates) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      return { ...prev, ...updates };
+    });
+  }, []);
 
   // بررسی وضعیت
   const isLoggedIn = !!user;
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout, isLoggedIn }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ user, login, logout, updateUser, isLoggedIn }),
+    [user, login, logout, updateUser, isLoggedIn]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => {

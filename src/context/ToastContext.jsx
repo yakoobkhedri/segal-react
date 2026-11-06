@@ -1,32 +1,95 @@
 // src/context/ToastContext.jsx
-import { createContext, useContext, useState, useCallback } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useMemo,
+} from 'react';
 
 const ToastContext = createContext();
 
+const MAX_TOASTS = 3; // حداکثر تعداد Toast همزمان
+
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
+  const timersRef = useRef(new Map()); // نگهداری timerها برای cleanup
 
-  const showToast = useCallback((message, type = 'success', duration = 3000) => {
-    const id = Date.now() + Math.random();
-    setToasts((prev) => [...prev, { id, message, type }]);
-
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, duration);
+  // پاک‌سازی همه timerها هنگام unmount (رفع نشت حافظه)
+  useEffect(() => {
+    const timers = timersRef.current;
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      timers.clear();
+    };
   }, []);
 
-  const removeToast = (id) => {
+  // حذف یک Toast (با پاک کردن timer مربوطه)
+  const removeToast = useCallback((id) => {
+    const timer = timersRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timersRef.current.delete(id);
+    }
     setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
+  }, []);
+
+  // نمایش Toast جدید
+  const showToast = useCallback((message, type = 'success', duration = 3000) => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+    // سقف تعداد Toastها: قدیمی‌ترین‌ها حذف شوند
+    setToasts((prev) => {
+      const next = [...prev, { id, message, type }];
+      if (next.length > MAX_TOASTS) {
+        // timer قدیمی‌ترین‌ها را پاک کن
+        const removed = next.slice(0, next.length - MAX_TOASTS);
+        removed.forEach((t) => {
+          const timer = timersRef.current.get(t.id);
+          if (timer) {
+            clearTimeout(timer);
+            timersRef.current.delete(t.id);
+          }
+        });
+        return next.slice(-MAX_TOASTS);
+      }
+      return next;
+    });
+
+    // تنظیم timer برای حذف خودکار
+    const timer = setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+      timersRef.current.delete(id);
+    }, duration);
+
+    timersRef.current.set(id, timer);
+  }, []);
+
+  // پایدار کردن value برای جلوگیری از re-renderهای اضافی
+  const value = useMemo(
+    () => ({ showToast, removeToast }),
+    [showToast, removeToast]
+  );
 
   return (
-    <ToastContext.Provider value={{ showToast }}>
+    <ToastContext.Provider value={value}>
       {children}
 
-      {/* نمایش Toast‌ها */}
+      {/* کانتینر Toastها */}
       <div
         className="position-fixed z-20 d-flex flex-column gap-2"
-        style={{ top: 20, left: '50%', transform: 'translateX(-50%)', minWidth: 300, maxWidth: 400 }}
+        role="status"
+        aria-live="polite"
+        style={{
+          top: 20,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          minWidth: 300,
+          maxWidth: 400,
+          pointerEvents: 'none', // کانتینر کلیک‌ها را نگیرد
+        }}
       >
         {toasts.map((toast) => (
           <div
@@ -41,7 +104,10 @@ export function ToastProvider({ children }) {
                 ? 'bg-warning text-dark'
                 : 'bg-gradient-main'
             }`}
-            style={{ animation: 'slideDown 0.3s ease-out' }}
+            style={{
+              animation: 'slideDown 0.3s ease-out',
+              pointerEvents: 'auto', // فقط خود Toast کلیک‌پذیر باشد
+            }}
           >
             {/* آیکون */}
             {toast.type === 'success' && (

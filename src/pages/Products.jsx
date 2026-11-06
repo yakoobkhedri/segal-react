@@ -1,43 +1,74 @@
 // src/pages/Products.jsx
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import { products } from '../data/products';
 import ProductCard from '../components/product/ProductCard';
 import ProductNumbers from '../components/product/ProductNumbers';
 import { useSearch } from '../context/SearchContext';
 
 export default function Products() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { searchQuery, setSearchQuery } = useSearch();
-  const [localSearch, setLocalSearch] = useState('');
 
-  // همگام‌سازی با query string
+  // stateهای محلی برای فیلتر
+  const [localSearch, setLocalSearch] = useState(searchParams.get('search') || '');
+  const [localCategory, setLocalCategory] = useState(searchParams.get('category') || '');
+
+  // همگام‌سازی با URL و Context
   useEffect(() => {
-    const queryFromUrl = searchParams.get('search') || '';
-    if (queryFromUrl) {
-      setLocalSearch(queryFromUrl);
-      setSearchQuery(queryFromUrl);
-    } else {
-      setLocalSearch(searchQuery);
+    const searchFromUrl = searchParams.get('search') || '';
+    const categoryFromUrl = searchParams.get('category') || '';
+
+    setLocalSearch(searchFromUrl || searchQuery);
+    setLocalCategory(categoryFromUrl);
+
+    // اگر search از URL اومد ولی Context خالی بود، Context رو هم پر کن
+    if (searchFromUrl && searchFromUrl !== searchQuery) {
+      setSearchQuery(searchFromUrl);
     }
   }, [searchParams]);
 
+  // تغییر search
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setLocalSearch(value);
     setSearchQuery(value);
+
+    // به‌روزرسانی URL
+    const newParams = new URLSearchParams(searchParams);
+    if (value.trim()) {
+      newParams.set('search', value.trim());
+    } else {
+      newParams.delete('search');
+    }
+    setSearchParams(newParams, { replace: true });
   };
 
-  // فیلتر محصولات
-  const filtered = products.filter((p) => {
-    if (!localSearch.trim()) return true;
-    const search = localSearch.toLowerCase();
-    return (
-      p.title.toLowerCase().includes(search) ||
-      p.brand?.toLowerCase().includes(search) ||
-      p.category?.toLowerCase().includes(search)
-    );
-  });
+  // پاک کردن فیلترها
+  const clearFilters = () => {
+    setLocalSearch('');
+    setLocalCategory('');
+    setSearchQuery('');
+    setSearchParams({}, { replace: true });
+  };
+
+  // فیلتر ترکیبی (category + search)
+  const filtered = useMemo(() => {
+    return products.filter((p) => {
+      // فیلتر دسته‌بندی
+      const matchesCategory = !localCategory || p.category === localCategory;
+
+      // فیلتر جستجو
+      const search = localSearch.trim().toLowerCase();
+      const matchesSearch =
+        !search ||
+        p.title.toLowerCase().includes(search) ||
+        p.brand?.toLowerCase().includes(search) ||
+        p.category?.toLowerCase().includes(search);
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [localSearch, localCategory]);
 
   return (
     <main className="mt-4 position-relative">
@@ -49,7 +80,10 @@ export default function Products() {
         <div className="row g-4">
           {/* فیلتر */}
           <div className="col-lg-3">
-            <form className="rounded-21 shadow10 p-3 bg-white">
+            <form
+              className="rounded-21 shadow10 p-3 bg-white"
+              onSubmit={(e) => e.preventDefault()}
+            >
               <div className="rounded-21 bg-gradient-main h-76 d-flex align-items-center justify-content-center gap-3 fs-15 fw-bold text-white mb-3">
                 <p className="mb-0">فیلتر نتایج جستجو</p>
               </div>
@@ -90,21 +124,28 @@ export default function Products() {
 
           {/* گرید محصولات */}
           <div className="col-lg-9">
-            {/* نمایش عنوان جستجو */}
-            {localSearch.trim() && (
-              <div className="d-flex align-items-center justify-content-between mb-3 px-2 position-relative">
+            {/* نمایش فیلترهای فعال */}
+            {(localSearch.trim() || localCategory) && (
+              <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 px-2 position-relative">
                 <p className="mb-0 fs-14">
-                  نتایج برای: <span className="font-bold text-main">"{localSearch}"</span>
+                  {localCategory && (
+                    <>
+                      دسته: <span className="font-bold text-main">{localCategory}</span>
+                    </>
+                  )}
+                  {localCategory && localSearch.trim() && <span className="mx-2">•</span>}
+                  {localSearch.trim() && (
+                    <>
+                      جستجو: <span className="font-bold text-main">"{localSearch}"</span>
+                    </>
+                  )}
                   <span className="text-gray"> ({filtered.length} محصول)</span>
                 </p>
                 <button
-                  onClick={() => {
-                    setLocalSearch('');
-                    setSearchQuery('');
-                  }}
+                  onClick={clearFilters}
                   className="fs-12 text-danger border-0 bg-transparent p-0 fw-bold"
                 >
-                  پاک کردن
+                  پاک کردن همه
                 </button>
               </div>
             )}
@@ -132,13 +173,14 @@ export default function Products() {
                 </svg>
                 <p className="fs-18 font-bold mb-2">نتیجه‌ای یافت نشد</p>
                 <p className="text-gray mb-3">
-                  برای "{localSearch}" محصولی پیدا نکردیم
+                  {localCategory && localSearch.trim()
+                    ? `در دسته "${localCategory}" برای "${localSearch}" محصولی پیدا نکردیم`
+                    : localCategory
+                    ? `در دسته "${localCategory}" محصولی پیدا نکردیم`
+                    : `برای "${localSearch}" محصولی پیدا نکردیم`}
                 </p>
                 <button
-                  onClick={() => {
-                    setLocalSearch('');
-                    setSearchQuery('');
-                  }}
+                  onClick={clearFilters}
                   className="bg-gradient-main text-white rounded-pill border-0 px-4 py-2 fs-14"
                 >
                   نمایش همه محصولات

@@ -8,23 +8,16 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'vendor-react';
-          }
-          if (id.includes('node_modules/react-router')) {
-            return 'vendor-router';
-          }
-          if (id.includes('node_modules/swiper')) {
-            return 'vendor-swiper';
-          }
-          if (id.includes('node_modules/react-helmet-async')) {
-            return 'vendor-helmet';
+          if (id.includes('node_modules')) {
+            if (id.includes('react-router')) return 'vendor-router';
+            if (id.includes('swiper')) return 'vendor-swiper';
+            if (id.includes('react-helmet-async')) return 'vendor-helmet';
+            if (id.includes('react-dom') || id.includes('/react/')) return 'vendor-react';
+            return 'vendor';
           }
         },
       },
     },
-    // minify: 'esbuild',  👈 حذف کن (پیش‌فرض oxc هست)
-    target: 'esnext',
+    target: 'es2020',
   },
-  // esbuild: { drop: ['console', 'debugger'] },  👈 حذف کن
 });
