@@ -70,6 +70,9 @@ export default function App() {
                   <SearchProvider>
                     <Suspense fallback={<LoadingFallback />}>
                       <Routes>
+                        {/* ✅ مسیرهای بدون Layout (بدون Header و Footer) */}
+                        <Route path="/login" element={<Login />} />
+                        
                         <Route element={<Layout />}>
                           {/* ✅ صفحات عمومی */}
                           <Route path="/" element={<Home />} />
@@ -82,7 +85,6 @@ export default function App() {
                           <Route path="/services" element={<Services />} />
                           <Route path="/blog" element={<Blog />} />
                           <Route path="/blog/:id" element={<SingleBlog />} />
-                          <Route path="/login" element={<Login />} />
                           <Route path="/cart" element={<Cart />} />
                           <Route path="/compare" element={<Compare />} />
 
