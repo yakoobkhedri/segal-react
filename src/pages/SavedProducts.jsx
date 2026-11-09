@@ -55,7 +55,7 @@ export default function SavedProducts() {
                 ) : (
                   <div className="row g-4">
                     {wishlist.map((product) => (
-                      <div key={product.id} className="col-12 col-sm-6 col-lg-4">
+                      <div key={product.id} className="col-12 col-md-6 col-xl-4">
                         <ProductCard product={product} />
                       </div>
                     ))}

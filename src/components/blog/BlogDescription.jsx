@@ -2,7 +2,7 @@
 export default function BlogDescription({ post }) {
   return (
     <div id="description" className="bg-white rounded-20 p-4 shadow10 d-flex flex-column flex-xl-row align-items-center gap-4 mt-4">
-      <div className="order-1 order-xl-0">
+      <div className="order-1 order-xl-0 flex-grow-1">
         <p className="fs-14 text-gray lh-32 mb-2 text-justify">{post.content}</p>
 
         <div className="d-flex align-items-center gap-2 font-bold mb-2">

@@ -5,13 +5,14 @@ import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import { Link } from 'react-router-dom';
 
 const services = [
   {
     id: 1,
     text: 'طراحی و ساخت انواع تابلوهای برق (MV-LV-HV) و بانک خازن',
     shape: '/assets/img/service1.png',
-    shapePos: 'start-0',
+    shapePos: 'end-0',
     shapeWidth: 'w-232',
     mobileShapeWidth: 'w-133',
     isGradient: false,
@@ -20,7 +21,7 @@ const services = [
     id: 2,
     text: 'توزیع کلیه ملزومات برق صنعتی، روشنایی و انواع کابل و سینی کابل',
     shape: '/assets/img/service2.png',
-    shapePos: 'end-0',
+    shapePos: 'start-0',
     shapeWidth: 'w-260',
     mobileShapeWidth: 'w-133',
     isGradient: true,
@@ -29,7 +30,7 @@ const services = [
     id: 3,
     text: 'عاملیت فروش اینورتر AAGER با بهترین کیفیت',
     shape: '/assets/img/service3.png',
-    shapePos: 'start-0',
+    shapePos: 'end-0',
     shapeWidth: 'w-232',
     mobileShapeWidth: 'w-133',
     isGradient: false,
@@ -92,17 +93,17 @@ export default function Services() {
           <img
             alt="shape"
             src="/assets/img/shapeService.png"
-            className="img-fluid px-0 w-285 top-0 end-0 position-absolute -z-0 servicesShape"
+            className="img-fluid px-0 w-285 top-0 start-0 position-absolute -z-0 servicesShape"
           />
           <img
             alt="shape"
             src="/assets/img/shapeService2.png"
-            className="img-fluid px-0 w-316 top-0 end-0 position-absolute -z-0 servicesShape"
+            className="img-fluid px-0 w-316 top-0 start-0 position-absolute -z-0 servicesShape"
           />
           <img
             alt="shape"
             src="/assets/img/shape3.png"
-            className="img-fluid px-0 w-417 h-413 top-0 end-0 position-absolute -z-0 servicesShape"
+            className="img-fluid px-0 w-417 h-413 top-0 start-0 position-absolute -z-0 servicesShape"
           />
 
           {/* ستون راست */}
@@ -152,7 +153,7 @@ export default function Services() {
             </div>
 
             {/* دکمه مشاهده همه */}
-            <a className="d-lg-flex seeAll d-none align-items-center text-dark shadow2 rounded-14 bg-white p-3 position-absolute bottom-0 w-100 end-0 start-0 mb-1 justify-content-center gap-3">
+            <Link to="/services" className="d-lg-flex seeAll d-none align-items-center text-dark shadow2 rounded-14 bg-white p-3 position-absolute bottom-0 w-100 end-0 start-0 mb-1 justify-content-center gap-3">
               <p className="mb-0 fs-14 fw-300">مشاهده همه</p>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -166,7 +167,7 @@ export default function Services() {
                   fill="#27817A"
                 />
               </svg>
-            </a>
+            </Link>
           </div>
 
           {/* ستون چپ (Swiper دسکتاپ) */}

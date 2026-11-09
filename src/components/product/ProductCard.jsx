@@ -115,11 +115,11 @@ export default function ProductCard({ product }) {
   return (
     <div className="rounded-21 bg-white p-3 shadow10 position-relative h-100">
       {/* دکمه‌های Compare و Share */}
-      <ul className="list-unstyled pe-0 mb-0 min-w-50 position-absolute start-0 left-ltr-auto z-10">
+      <ul className="list-unstyled pe-0 mb-0 min-w-50 position-absolute end-0 left-ltr-auto z-10">
         <li>
           <button
             type="button"
-            className="px-0 border-0 bg-transparent"
+            className="px-0 border-0 bg-transparent mb-2"
             title={isWished ? 'حذف از علاقه‌مندی' : 'افزودن به علاقه‌مندی'}
             onClick={(e) => {
               e.preventDefault();
@@ -179,7 +179,7 @@ export default function ProductCard({ product }) {
 
       {/* برچسب تخفیف */}
       {discount > 0 && hasPrice && (
-        <span className="position-absolute top-0 end-0 bg-danger text-white fs-11 fw-bold px-2 py-1 rounded-bl-12 z-10 mt-2 me-2 rounded-pill">
+        <span className="position-absolute ms-2 top-0 start-0 bg-danger text-white fs-11 fw-bold px-2 py-1 rounded-bl-12 z-10 mt-2 me-2 rounded-pill">
           {discount}٪
         </span>
       )}

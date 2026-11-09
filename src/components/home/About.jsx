@@ -3,7 +3,7 @@ export default function About() {
     <section className="mt-245" id="about">
       <div className="container">
         <div className="bg-white shadow2 rounded-30 position-relative px-lg-5 px-4">
-          <img alt="shape" src="/assets/img/aboutShape.png" className="img-fluid z-0 position-absolute start-0 top-0" />
+          <img alt="shape" src="/assets/img/aboutShape.png" className="img-fluid z-0 position-absolute end-0 top-0" />
 
           <div className="row align-items-center">
             <div className="col-lg-5">

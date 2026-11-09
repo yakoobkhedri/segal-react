@@ -442,7 +442,7 @@ export default function Products() {
             {filtered.length > 0 ? (
               <div className="row g-4">
                 {filtered.map((product) => (
-                  <div key={product.id} className="col-12 col-sm-6 col-lg-4">
+                  <div key={product.id} className="col-12 col-md-6 col-xl-4">
                     <ProductCard product={product} />
                   </div>
                 ))}

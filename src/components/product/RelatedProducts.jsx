@@ -35,8 +35,8 @@ export default function RelatedProducts({ currentProduct }) {
         </Link>
       </div>
 
-      <div className="bg-white rounded-20 shadow10 p-3">
-        <Swiper
+      <div className="bg-white rounded-20 bg-white overflow-hidden">
+        <Swiper className='p-3'
           modules={[Navigation]}
           spaceBetween={16}
           slidesPerView={1}

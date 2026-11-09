@@ -18,7 +18,7 @@ export default function Category() {
   return (
     <section className="mt-lg-5 pt-lg-3">
       <div className="container px-0 px-md-3">
-        <div className="position-relative">
+        <div className="position-relative" id='category'>
           <Swiper
             className="category py-lg-5 py-4 px-lg-3 px-2"
             modules={[Navigation]}

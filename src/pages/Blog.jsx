@@ -61,7 +61,7 @@ export default function Blog() {
       <main className="mt-4 position-relative">
         <BlogBanner />
 
-        <section id="blog" className="-mt-126 position-relative">
+        <section id="blog" className="mt-4 position-relative">
           <div className="container">
             <div className="row g-4">
               {/* ستون محتوا */}

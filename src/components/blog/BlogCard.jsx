@@ -51,7 +51,14 @@ export default function BlogCard({ post }) {
       <p className="fs-13 text-gray mt-3 lh-24 mb-4">
         {post.excerpt || post.content?.slice(0, 150) + ' ...'}
       </p>
-
+      <svg className="position-absolute left-54 -bottom-29" xmlns="http://www.w3.org/2000/svg" width="115" height="29" viewBox="0 0 115 29" fill="none">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M0.808594 0C12.6826 0 23.9746 5.14326 31.7683 14.1015C48.3963 33.2142 77.9745 33.5444 95.025 14.8076L104.338 4.57329C106.989 1.6604 110.745 0 114.683 0H0.808594Z"
+          fill="white"
+        />
+      </svg>
       <Link
         to={`/blog/${post.id}`}
         className="d-flex align-items-center justify-content-center bg-main3 left-87 z-0 -bottom-19 position-absolute w-61 h-61 rounded-circle"
@@ -69,15 +76,6 @@ export default function BlogCard({ post }) {
           </defs>
         </svg>
       </Link>
-
-      <svg className="position-absolute left-54 -bottom-29" xmlns="http://www.w3.org/2000/svg" width="115" height="29" viewBox="0 0 115 29" fill="none">
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M0.808594 0C12.6826 0 23.9746 5.14326 31.7683 14.1015C48.3963 33.2142 77.9745 33.5444 95.025 14.8076L104.338 4.57329C106.989 1.6604 110.745 0 114.683 0H0.808594Z"
-          fill="white"
-        />
-      </svg>
     </div>
   );
 }

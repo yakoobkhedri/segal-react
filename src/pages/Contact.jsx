@@ -128,136 +128,133 @@ export default function Contact() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
+            {/* محتوا */}
+            <div className='mt-5 p-4 pt-0'>
+              <div className="row g-4">
+                {/* فرم */}
+                <div className="col-lg-7">
+                  <div className="bg-white rounded-21 shadow10 p-4 h-100">
+                    <h3 className="font-bold fs-20 mb-2">پیام خود را برای ما ارسال کنید</h3>
+                    <p className="fs-14 text-gray mb-4">
+                      هر سوال یا پیشنهادی دارید، از طریق فرم زیر با ما در میان بگذارید.
+                    </p>
 
-      {/* محتوا */}
-      <section className="pb-5">
-        <div className="container">
-          <div className="row g-4">
-            {/* فرم */}
-            <div className="col-lg-7">
-              <div className="bg-white rounded-21 shadow10 p-4 h-100">
-                <h3 className="font-bold fs-20 mb-2">پیام خود را برای ما ارسال کنید</h3>
-                <p className="fs-14 text-gray mb-4">
-                  هر سوال یا پیشنهادی دارید، از طریق فرم زیر با ما در میان بگذارید.
-                </p>
+                    <form onSubmit={handleSubmit}>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="fs-13 font-bold mb-2 d-block">نام و نام خانوادگی *</label>
+                          <input
+                            name="name"
+                            value={form.name}
+                            onChange={handleChange}
+                            className="rounded-13 bg-gray2 border-0 outline-none h-55 d-block w-100 px-4"
+                            placeholder="نام کامل شما"
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="fs-13 font-bold mb-2 d-block">شماره تماس</label>
+                          <input
+                            name="phone"
+                            value={form.phone}
+                            onChange={handleChange}
+                            className="rounded-13 bg-gray2 border-0 outline-none h-55 d-block w-100 px-4"
+                            placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="fs-13 font-bold mb-2 d-block">ایمیل</label>
+                          <input
+                            name="email"
+                            type="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            className="rounded-13 bg-gray2 border-0 outline-none h-55 d-block w-100 px-4"
+                            placeholder="you@example.com"
+                            dir="ltr"
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="fs-13 font-bold mb-2 d-block">موضوع</label>
+                          <input
+                            name="subject"
+                            value={form.subject}
+                            onChange={handleChange}
+                            className="rounded-13 bg-gray2 border-0 outline-none h-55 d-block w-100 px-4"
+                            placeholder="موضوع پیام"
+                          />
+                        </div>
+                        <div className="col-12">
+                          <label className="fs-13 font-bold mb-2 d-block">پیام شما *</label>
+                          <textarea
+                            name="message"
+                            value={form.message}
+                            onChange={handleChange}
+                            rows={5}
+                            className="rounded-13 bg-gray2 border-0 outline-none d-block w-100 p-3 resize-none"
+                            placeholder="متن پیام..."
+                          ></textarea>
+                        </div>
+                      </div>
 
-                <form onSubmit={handleSubmit}>
-                  <div className="row g-3">
-                    <div className="col-md-6">
-                      <label className="fs-13 font-bold mb-2 d-block">نام و نام خانوادگی *</label>
-                      <input
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        className="rounded-13 bg-gray2 border-0 outline-none h-55 d-block w-100 px-4"
-                        placeholder="نام کامل شما"
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="fs-13 font-bold mb-2 d-block">شماره تماس</label>
-                      <input
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        className="rounded-13 bg-gray2 border-0 outline-none h-55 d-block w-100 px-4"
-                        placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="fs-13 font-bold mb-2 d-block">ایمیل</label>
-                      <input
-                        name="email"
-                        type="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        className="rounded-13 bg-gray2 border-0 outline-none h-55 d-block w-100 px-4"
-                        placeholder="you@example.com"
-                        dir="ltr"
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="fs-13 font-bold mb-2 d-block">موضوع</label>
-                      <input
-                        name="subject"
-                        value={form.subject}
-                        onChange={handleChange}
-                        className="rounded-13 bg-gray2 border-0 outline-none h-55 d-block w-100 px-4"
-                        placeholder="موضوع پیام"
-                      />
-                    </div>
-                    <div className="col-12">
-                      <label className="fs-13 font-bold mb-2 d-block">پیام شما *</label>
-                      <textarea
-                        name="message"
-                        value={form.message}
-                        onChange={handleChange}
-                        rows={5}
-                        className="rounded-13 bg-gray2 border-0 outline-none d-block w-100 p-3 resize-none"
-                        placeholder="متن پیام..."
-                      ></textarea>
-                    </div>
+                      <button
+                        type="submit"
+                        className="d-flex align-items-center justify-content-center gap-2 rounded-14 bg-gradient-main py-3 px-4 mt-4 border-0"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                          <path
+                            d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <p className="mb-0 fw-bold text-white">ارسال پیام</p>
+                      </button>
+                    </form>
                   </div>
+                </div>
 
-                  <button
-                    type="submit"
-                    className="d-flex align-items-center justify-content-center gap-2 rounded-14 bg-gradient-main py-3 px-4 mt-4 border-0"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
-                        stroke="white"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <p className="mb-0 fw-bold text-white">ارسال پیام</p>
-                  </button>
-                </form>
+                {/* اطلاعات تماس */}
+                <div className="col-lg-5">
+                  <div className="d-flex flex-column gap-3 h-100">
+                    {contactInfo.map((info) => (
+                      <div
+                        key={info.id}
+                        className="bg-white rounded-21 shadow10 p-3 d-flex align-items-start gap-3"
+                      >
+                        <div
+                          className="d-flex align-items-center justify-content-center rounded-14 flex-shrink-0"
+                          style={{ width: 56, height: 56, backgroundColor: '#e9f2f2' }}
+                        >
+                          {info.icon}
+                        </div>
+                        <div className="flex-grow-1">
+                          <p className="fs-13 text-gray mb-1">{info.title}</p>
+                          <p className="fs-14 fw-bold mb-0" style={{ lineHeight: 1.8 }}>
+                            {info.value}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* نقشه */}
+              <div className="bg-white rounded-21 shadow10 mt-4 overflow-hidden">
+                <iframe
+                  title="map"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3238.964044737352!2d51.371!3d35.7767!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzXCsDQ2JzM2LjEiTiA1McKwMjInMTUuNiJF!5e0!3m2!1sen!2s!4v1234567890"
+                  width="100%"
+                  height="350"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
               </div>
             </div>
-
-            {/* اطلاعات تماس */}
-            <div className="col-lg-5">
-              <div className="d-flex flex-column gap-3 h-100">
-                {contactInfo.map((info) => (
-                  <div
-                    key={info.id}
-                    className="bg-white rounded-21 shadow10 p-3 d-flex align-items-start gap-3"
-                  >
-                    <div
-                      className="d-flex align-items-center justify-content-center rounded-14 flex-shrink-0"
-                      style={{ width: 56, height: 56, backgroundColor: '#e9f2f2' }}
-                    >
-                      {info.icon}
-                    </div>
-                    <div className="flex-grow-1">
-                      <p className="fs-13 text-gray mb-1">{info.title}</p>
-                      <p className="fs-14 fw-bold mb-0" style={{ lineHeight: 1.8 }}>
-                        {info.value}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* نقشه */}
-          <div className="bg-white rounded-21 shadow10 mt-4 overflow-hidden">
-            <iframe
-              title="map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3238.964044737352!2d51.371!3d35.7767!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzXCsDQ2JzM2LjEiTiA1McKwMjInMTUuNiJF!5e0!3m2!1sen!2s!4v1234567890"
-              width="100%"
-              height="350"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
           </div>
         </div>
       </section>

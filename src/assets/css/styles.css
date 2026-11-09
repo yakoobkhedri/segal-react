@@ -1258,13 +1258,16 @@ a {
 .swiper-button-prev::after,
 .swiper-button-prev3::after {
     content: url('../img/arrow.png');
+    transform: rotate(180deg);
 }
 
 .swiper-button-prev {
     left: -29px;
     top: 136px;
 }
-
+.swiper-button-prev svg,.swiper-button-next svg {
+   display: none;
+}
 .swiper-button-prev3 {
     position: absolute;
     left: auto;
@@ -1276,7 +1279,6 @@ a {
 .swiper-button-next::after,
 .swiper-button-next3::after {
     content: url('../img/arrow.png');
-    transform: rotate(180deg);
 }
 
 .swiper-button-next {
@@ -1973,7 +1975,9 @@ input[type="number"] {
         font-size: 12px;
         padding-top: 29px !important;
     }
-
+    #category .swiper-button-next svg{
+        display: none!important;
+    }
     #services .w-285 {
         width: 243px;
     }

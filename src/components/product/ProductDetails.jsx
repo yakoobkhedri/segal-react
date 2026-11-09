@@ -41,7 +41,7 @@ export default function ProductDetails({ product }) {
   ].filter((s) => s.value && s.value !== '—');
 
   return (
-    <div className="row g-4 bg-white rounded-20 pb-4 shadow10">
+    <div className="row g-4 bg-white rounded-20 pb-4 shadow10 mt-5">
       {/* ستون چپ: گالری + خرید */}
       <div className="col-lg-4">
         {/* گالری */}
