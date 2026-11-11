@@ -1,6 +1,7 @@
+
 // src/components/home/Customer.jsx
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
+import { Pagination, Autoplay } from 'swiper/modules';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -14,31 +15,31 @@ const customers = [
   },
   {
     id: 2,
-    title: 'شرکت واردات و صادرات خاویار عطا',
+    title: 'شرکت واردات علی',
     tag: 'سیم کشی',
     text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است.',
   },
   {
     id: 3,
-    title: 'شرکت واردات و صادرات خاویار عطا',
+    title: 'شرکت واردات رضا',
     tag: 'سیم کشی',
     text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است.',
   },
   {
     id: 4,
-    title: 'شرکت واردات و صادرات خاویار عطا',
+    title: 'شرکت محمد',
     tag: 'سیم کشی',
     text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است.',
   },
   {
     id: 5,
-    title: 'شرکت واردات و صادرات خاویار عطا',
+    title: 'شرکت من',
     tag: 'سیم کشی',
     text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است.',
   },
   {
     id: 6,
-    title: 'شرکت واردات و صادرات خاویار عطا',
+    title: 'شرکت توحید',
     tag: 'سیم کشی',
     text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است.',
   },
@@ -48,7 +49,6 @@ export default function Customer() {
   return (
     <section id="customer" className="mt-245 mb-5 h-400 overflow-hidden">
       <div className="container position-relative h-100">
-        {/* شکل‌های پس‌زمینه */}
         <img
           alt="shape"
           src="/assets/img/customerShape.png"
@@ -66,31 +66,35 @@ export default function Customer() {
         />
 
         <div className="d-flex align-items-center h-100 position-relative z-10">
-          {/* تیتر عمودی */}
           <h3 className="font-bold text-white rotate-90-translate-y-39 flex-shrink-0">
             مشتریان ما
           </h3>
 
-          {/* اسلایدر */}
           <div className="w-100 position-relative -right-40">
             <Swiper
               className="customer"
-              modules={[Pagination]}
+              modules={[Pagination, Autoplay]}
               spaceBetween={16}
               slidesPerView={1}
+              // loop={true}  // ❌ موقتاً غیرفعال (باگ Swiper)
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }}
               pagination={{
                 el: '.swiper-pagination4',
                 clickable: true,
               }}
               breakpoints={{
-                576: { slidesPerView: 2 },
-                992: { slidesPerView: 3 },
-                1200: { slidesPerView: 4 },
+                576: { slidesPerView: 2, spaceBetween: 16 },
+                992: { slidesPerView: 3, spaceBetween: 16 },
+                1200: { slidesPerView: 4, spaceBetween: 16 },
               }}
             >
               {customers.map((customer) => (
                 <SwiperSlide key={customer.id}>
-                  <div className="rounded-33 bg-white position-relative p-4">
+                  <div className="rounded-33 bg-white position-relative p-4 h-100">
                     <img
                       alt="label"
                       src="/assets/img/customerLabel.png"

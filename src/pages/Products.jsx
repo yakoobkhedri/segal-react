@@ -238,7 +238,7 @@ export default function Products() {
   return (
     <main className="mt-4 position-relative">
       <section className="container pt-md-3">
-        <ProductNumbers />
+        {/* <ProductNumbers /> */}
       </section>
 
       <section className="container mt-4">
