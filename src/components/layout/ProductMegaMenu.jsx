@@ -8,7 +8,7 @@ export default function ProductMegaMenu() {
 
   return (
     <div
-      className="position-absolute bg-white rounded-18 shadow10 p-3 mt-2 start-0 end-0"
+      className="position-absolute bg-white rounded-18 shadow10 p-3 mt-2 start-0 end-0 top-0 z-50"
       style={{ minWidth: 'min(700px, calc(100vw - 40px))' }}
       onMouseEnter={(e) => e.stopPropagation()}
     >

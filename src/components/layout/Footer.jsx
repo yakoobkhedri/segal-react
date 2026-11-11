@@ -217,7 +217,7 @@ export default function Footer() {
 
       {/* footer mobile menu */}
       <div className="position-fixed footerMobileMenu shadow4 text-center bg-blur fs-12 fw-bold py-2 -bottom-23 end-0 start-0 rounded-t-42 w-100 z-20 d-lg-none">
-        <svg className="position-absolute -top-32 end-0 left-14 mx-auto" xmlns="http://www.w3.org/2000/svg" width="150" height="33" viewBox="0 0 150 33" fill="none">
+        <svg className="position-absolute -top-32 start-0 left-14 mx-auto" xmlns="http://www.w3.org/2000/svg" width="150" height="33" viewBox="0 0 150 33" fill="none">
           <g filter="url(#filter0_b_501_83)">
             <path fillRule="evenodd" clipRule="evenodd" d="M149.808 32.3286C143.578 32.3286 137.492 30.4514 132.344 26.9416L107.867 10.2526C87.626 -3.54804 60.9629 -3.40473 40.8716 10.6125L17.7373 26.7525C12.5347 30.3823 6.34375 32.3286 0 32.3286H149.808Z" fill="white" fillOpacity="0.6" />
           </g>

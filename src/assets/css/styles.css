@@ -193,6 +193,9 @@ a {
 .z-20 {
     z-index: 20;
 }
+.z-50 {
+    z-index: 50 !important;
+}
 
 /* padding */
 .py-12 {
@@ -553,7 +556,7 @@ a {
 }
 
 .left-14 {
-    left: 14px;
+    left: 14px !important;
 }
 
 .-left-15 {

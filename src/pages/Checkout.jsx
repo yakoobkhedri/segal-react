@@ -47,43 +47,46 @@ export default function Checkout() {
     setStep(2);
   };
 
-  const handlePaymentSubmit = (e) => {
-    e.preventDefault();
-    if (cart.length === 0) {
-      showToast('سبد خرید خالی است', 'error');
-      return;
-    }
+  const handlePaymentSubmit = async (e) => {
+  e.preventDefault();
+  if (cart.length === 0) {
+    showToast('سبد خرید خالی است', 'error');
+    return;
+  }
 
-    // ۱. ذخیره مبلغ نهایی (قبل از پاک شدن سبد)
-    setFinalAmount(totalPrice);
+  setFinalAmount(totalPrice);
 
-    // ۲. ساخت آبجکت سفارش
-    const newOrder = {
-      orderNumber: String(orderNumber),
-      date: new Date().toLocaleDateString('fa-IR'),
-      status: 'در حال پردازش',
-      products: cart.map(({ id, title, image, price, oldPrice, quantity, brand, category, color }) => ({
-        id, title, image, price, oldPrice, quantity, brand, category, color,
-      })),
-      address: `${form.province}، ${form.city}، ${form.address} - کدپستی: ${form.postalCode}`,
-      receiver: form.fullName,
-      phone: form.phone,
-      paymentMethod: form.paymentMethod,
-      productCost: totalPrice,
-      shippingCost: 0,
-      totalCost: totalPrice,
-      shippingProgress: 25,
-      shippingStatus: 'در حال پردازش',
-    };
-
-    // ۳. ذخیره سفارش در OrderContext
-    addOrder(newOrder);
-
-    // ۴. رفتن به صفحه موفقیت و پاک کردن سبد
-    setStep(3);
-    clearCart();
-    showToast('سفارش با موفقیت ثبت شد', 'success');
+  const newOrder = {
+    orderNumber: String(orderNumber),
+    date: new Date().toLocaleDateString('fa-IR'),
+    status: 'در حال پردازش',
+    products: cart.map(({ id, title, image, price, oldPrice, quantity, brand, category, color }) => ({
+      id, title, image, price, oldPrice, quantity, brand, category, color,
+    })),
+    address: `${form.province}، ${form.city}، ${form.address} - کدپستی: ${form.postalCode}`,
+    receiver: form.fullName,
+    phone: form.phone,
+    userPhone: form.phone, // ✅ برای شناسایی سفارش
+    paymentMethod: form.paymentMethod,
+    productCost: totalPrice,
+    shippingCost: 0,
+    totalCost: totalPrice,
+    shippingProgress: 25,
+    shippingStatus: 'در حال پردازش',
   };
+
+  // ✅ ثبت در Supabase
+  const result = await addOrder(newOrder);
+
+  if (!result) {
+    showToast('خطا در ثبت سفارش. لطفا دوباره تلاش کنید', 'error');
+    return;
+  }
+
+  setStep(3);
+  clearCart();
+  showToast('سفارش با موفقیت ثبت شد', 'success');
+};
 
   // سبد خالی
   if (cart.length === 0 && step !== 3) {

@@ -2,13 +2,18 @@
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
-import { products } from '../../data/products';
 import ProductCard from './ProductCard';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
 
+import { useProducts } from '../../hooks/useProducts';
+
+
 export default function RelatedProducts({ currentProduct }) {
+  const { products, loading } = useProducts();
+  if (loading) return null;
+
   const related = products
     .filter((p) => p.id !== currentProduct.id && p.category === currentProduct.category)
     .slice(0, 6);

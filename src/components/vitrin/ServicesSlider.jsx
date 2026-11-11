@@ -33,7 +33,7 @@ const services = [
     id: 4,
     text: 'عاملیت فروش اینورتر AAGER با بهترین کیفیت',
     image: '/assets/img/service3.png',
-    imagePos: 'start-0',
+    imagePos: 'end-0',
     isGradient: false,
   },
 ];

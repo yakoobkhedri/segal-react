@@ -14,7 +14,6 @@ export default function ProfileInfo() {
     phone: user?.phone || '',
     email: user?.email || '',
     nationalCode: user?.nationalCode || '',
-    address: user?.address || '',
   });
 
   const handleChange = (e) => {
@@ -22,13 +21,11 @@ export default function ProfileInfo() {
   };
 
   const handleEditClick = () => {
-    // فرم را با مقادیر فعلی کاربر پر کن
     setForm({
       name: user?.name || '',
       phone: user?.phone || '',
       email: user?.email || '',
       nationalCode: user?.nationalCode || '',
-      address: user?.address || '',
     });
     setIsEditing(true);
   };
@@ -40,7 +37,6 @@ export default function ProfileInfo() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // اعتبارسنجی
     if (!form.name.trim()) {
       showToast('لطفا نام و نام خانوادگی را وارد کنید', 'error');
       return;
@@ -61,31 +57,22 @@ export default function ProfileInfo() {
       return;
     }
 
-    // به‌روزرسانی کاربر
-    if (typeof updateUser !== 'function') {
-      showToast('خطا: تابع به‌روزرسانی کاربر یافت نشد', 'error');
-      return;
-    }
-
     updateUser({
       name: form.name.trim(),
       phone: form.phone,
       email: form.email.trim(),
       nationalCode: form.nationalCode,
-      address: form.address.trim(),
     });
 
     showToast('اطلاعات با موفقیت به‌روزرسانی شد', 'success');
     setIsEditing(false);
   };
 
-  // فیلدهای نمایشی
   const infoItems = [
     { label: 'نام و نام خانوادگی', key: 'name', value: user?.name, dir: 'rtl' },
     { label: 'شماره موبایل', key: 'phone', value: user?.phone, dir: 'ltr' },
     { label: 'ایمیل', key: 'email', value: user?.email, dir: 'ltr' },
     { label: 'کد ملی', key: 'nationalCode', value: user?.nationalCode, dir: 'ltr' },
-    { label: 'آدرس', key: 'address', value: user?.address, dir: 'rtl', full: true },
   ];
 
   return (
@@ -97,7 +84,6 @@ export default function ProfileInfo() {
 
             <div className="flex-grow-1">
               <div className="rounded-22 p-4 bg-white shadow6">
-                {/* هدر */}
                 <div className="d-flex align-items-center justify-content-between border-bottom pb-3 mb-4">
                   <div className="d-flex align-items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -119,40 +105,26 @@ export default function ProfileInfo() {
                   )}
                 </div>
 
-                {/* حالت نمایش */}
                 {!isEditing && (
-                  <>
-                    <div className="row g-4">
-                      {infoItems.map((item) => (
-                        <div key={item.key} className={item.full ? 'col-12' : 'col-md-6'}>
-                          <div className="bg-gray2 rounded-14 p-3 h-100">
-                            <p className="fs-12 text-gray mb-1">{item.label}</p>
-                            <p className="fs-14 fw-bold mb-0" dir={item.dir}>
-                              {item.value || '—'}
-                            </p>
-                          </div>
+                  <div className="row g-4">
+                    {infoItems.map((item) => (
+                      <div key={item.key} className="col-md-6">
+                        <div className="bg-gray2 rounded-14 p-3 h-100">
+                          <p className="fs-12 text-gray mb-1">{item.label}</p>
+                          <p className="fs-14 fw-bold mb-0" dir={item.dir}>
+                            {item.value || '—'}
+                          </p>
                         </div>
-                      ))}
-                    </div>
-
-                    {!user && (
-                      <div className="mt-4 bg-warning bg-opacity-10 rounded-14 p-3">
-                        <p className="fs-13 mb-0">
-                          ⚠️ شما هنوز وارد نشده‌اید. لطفا ابتدا وارد شوید.
-                        </p>
                       </div>
-                    )}
-                  </>
+                    ))}
+                  </div>
                 )}
 
-                {/* حالت ویرایش */}
                 {isEditing && (
                   <form onSubmit={handleSubmit}>
                     <div className="row g-4">
                       <div className="col-md-6">
-                        <label className="fs-13 font-bold mb-2 d-block">
-                          نام و نام خانوادگی *
-                        </label>
+                        <label className="fs-13 font-bold mb-2 d-block">نام و نام خانوادگی *</label>
                         <input
                           name="name"
                           value={form.name}
@@ -162,9 +134,7 @@ export default function ProfileInfo() {
                         />
                       </div>
                       <div className="col-md-6">
-                        <label className="fs-13 font-bold mb-2 d-block">
-                          شماره موبایل *
-                        </label>
+                        <label className="fs-13 font-bold mb-2 d-block">شماره موبایل *</label>
                         <input
                           name="phone"
                           value={form.phone}
@@ -176,9 +146,7 @@ export default function ProfileInfo() {
                         />
                       </div>
                       <div className="col-md-6">
-                        <label className="fs-13 font-bold mb-2 d-block">
-                          ایمیل
-                        </label>
+                        <label className="fs-13 font-bold mb-2 d-block">ایمیل</label>
                         <input
                           name="email"
                           type="email"
@@ -190,9 +158,7 @@ export default function ProfileInfo() {
                         />
                       </div>
                       <div className="col-md-6">
-                        <label className="fs-13 font-bold mb-2 d-block">
-                          کد ملی
-                        </label>
+                        <label className="fs-13 font-bold mb-2 d-block">کد ملی</label>
                         <input
                           name="nationalCode"
                           value={form.nationalCode}
@@ -202,19 +168,6 @@ export default function ProfileInfo() {
                           className="rounded-13 bg-gray2 border-0 outline-none h-55 d-block w-100 px-4"
                           placeholder="۱۰ رقم"
                         />
-                      </div>
-                      <div className="col-12">
-                        <label className="fs-13 font-bold mb-2 d-block">
-                          آدرس
-                        </label>
-                        <textarea
-                          name="address"
-                          value={form.address}
-                          onChange={handleChange}
-                          rows={2}
-                          className="rounded-13 bg-gray2 border-0 outline-none d-block w-100 p-3 resize-none"
-                          placeholder="آدرس شما"
-                        ></textarea>
                       </div>
                     </div>
 

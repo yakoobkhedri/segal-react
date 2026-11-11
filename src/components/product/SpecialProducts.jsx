@@ -2,13 +2,15 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { Link } from 'react-router-dom';
-import { products } from '../../data/products';
 import ProductCard from './ProductCard';
+import { useProducts } from '../../hooks/useProducts';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
 
 export default function SpecialProducts() {
+  const { products, loading } = useProducts();
+  if (loading) return null;
   return (
     <div className="mt-5 pt-2">
       <div className="rounded-19 bg-gray6 d-flex justify-content-between p-3 position-relative mt-5">

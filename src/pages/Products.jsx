@@ -1,7 +1,7 @@
 // src/pages/Products.jsx
+import { useProducts } from '../hooks/useProducts';
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { products } from '../data/products';
 import { categoryNames } from '../data/categories';
 import ProductCard from '../components/product/ProductCard';
 import ProductNumbers from '../components/product/ProductNumbers';
@@ -59,6 +59,7 @@ function FilterAccordion({ title, isOpen, onToggle, children }) {
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { products, loading, error } = useProducts();
   const { searchQuery, setSearchQuery } = useSearch();
 
   const [localSearch, setLocalSearch] = useState(searchParams.get('search') || '');
@@ -150,17 +151,17 @@ export default function Products() {
     setSearchParams({}, { replace: true });
   };
 
-  // لیست برندها و رنگ‌های موجود
+  // لیست برندها و رنگ‌های موجود (✅ products به dependency اضافه شد)
   const availableBrands = useMemo(
     () => [...new Set(products.map((p) => p.brand).filter(Boolean))],
-    []
+    [products]
   );
   const availableColors = useMemo(
     () => [...new Set(products.map((p) => p.color).filter((c) => c && c !== '—'))],
-    []
+    [products]
   );
 
-  // فیلتر ترکیبی
+  // فیلتر ترکیبی (✅ products به dependency اضافه شد)
   const filtered = useMemo(() => {
     return products.filter((p) => {
       // دسته
@@ -196,7 +197,7 @@ export default function Products() {
         matchesRating
       );
     });
-  }, [localSearch, localCategory, selectedBrands, selectedColors, maxPrice, minRating]);
+  }, [products, localSearch, localCategory, selectedBrands, selectedColors, maxPrice, minRating]);
 
   // آیا فیلتری فعال است؟
   const hasActiveFilter =
@@ -207,8 +208,38 @@ export default function Products() {
     maxPrice ||
     minRating > 0;
 
+  if (loading) {
+    return (
+      <main className="mt-4">
+        <div className="container text-center py-5">
+          <div className="spinner-border text-main" style={{ width: 50, height: 50 }}></div>
+          <p className="mt-3 text-gray">در حال بارگذاری محصولات...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="mt-4">
+        <div className="container text-center py-5">
+          <p className="text-danger mb-3">خطا: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-gradient-main text-white rounded-14 border-0 py-2 px-4"
+          >
+            تلاش مجدد
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="mt-4 position-relative">
+      <section className="container pt-md-3">
+        <ProductNumbers />
+      </section>
 
       <section className="container mt-4">
         <div className="row g-4">
@@ -232,7 +263,7 @@ export default function Products() {
                 />
               </div>
 
-              {/* ✅ آکاردئون دسته‌بندی */}
+              {/* آکاردئون دسته‌بندی */}
               <FilterAccordion
                 title="دسته‌بندی"
                 isOpen={openFilters.category}
@@ -266,7 +297,7 @@ export default function Products() {
                 </ul>
               </FilterAccordion>
 
-              {/* ✅ آکاردئون قیمت */}
+              {/* آکاردئون قیمت */}
               <FilterAccordion
                 title="قیمت"
                 isOpen={openFilters.price}
@@ -288,7 +319,7 @@ export default function Products() {
                 </div>
               </FilterAccordion>
 
-              {/* ✅ آکاردئون رنگ */}
+              {/* آکاردئون رنگ */}
               <FilterAccordion
                 title="رنگ"
                 isOpen={openFilters.color}
@@ -299,7 +330,9 @@ export default function Products() {
                     <label
                       key={color}
                       className={`d-flex align-items-center gap-2 px-2 py-1 rounded-8 cursor-pointer fs-13 border ${
-                        selectedColors.includes(color) ? 'bg-main3 border-main text-main' : 'bg-white'
+                        selectedColors.includes(color)
+                          ? 'bg-main3 border-main text-main'
+                          : 'bg-white'
                       }`}
                       style={{ cursor: 'pointer' }}
                     >
@@ -315,7 +348,7 @@ export default function Products() {
                 </div>
               </FilterAccordion>
 
-              {/* ✅ آکاردئون برند */}
+              {/* آکاردئون برند */}
               <FilterAccordion
                 title="برند"
                 isOpen={openFilters.brand}
@@ -340,7 +373,7 @@ export default function Products() {
                 </ul>
               </FilterAccordion>
 
-              {/* ✅ آکاردئون امتیاز */}
+              {/* آکاردئون امتیاز */}
               <FilterAccordion
                 title="امتیاز"
                 isOpen={openFilters.rating}

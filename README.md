@@ -1,16 +1,75 @@
-# React + Vite
+# 🛒 Segal React — فروشگاه تخصصی تجهیزات برق
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+یک فروشگاه اینترنتی مدرن و کامل برای تجهیزات برق صنعتی، اتوماسیون، سنسور و ابزار دقیق. ساخته شده با **React 19**، **Vite**، و **Supabase**.
 
-Currently, two official plugins are available:
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)
+![Supabase](https://img.shields.io/badge/Supabase-2-3ECF8E?logo=supabase)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ ویژگی‌ها
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🛍️ فروشگاه
+- نمایش محصولات از **Supabase** (دیتابیس واقعی)
+- فیلتر پیشرفته: دسته‌بندی، برند، رنگ، قیمت، امتیاز
+- جستجوی زنده با پیشنهادات
+- مگا منوی آکاردئونی (دسکتاپ + موبایل)
+- صفحه محصول با گالری تصاویر، مشخصات فنی، نظرات
+- محصولات مرتبط و ویژه
 
-## Expanding the ESLint configuration
+### 🛒 سبد خرید و سفارش
+- افزودن/حذف/تغییر تعداد (با اعتبارسنجی کامل)
+- همگام‌سازی بین تب‌ها (`storage` event)
+- تسویه حساب چندمرحله‌ای
+- ذخیره سفارشات در **Supabase**
+- مشاهده سفارشات و آمار در پروفایل
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 👤 حساب کاربری
+- ورود با OTP (دمو: کد `12345` + کد امنیتی `858569`)
+- ویرایش اطلاعات کاربری
+- مدیریت آدرس‌ها (چند آدرس، پیش‌فرض)
+- علاقه‌مندی‌ها و مقایسه محصولات (ذخیره در Supabase)
+
+### 🎨 رابط کاربری
+- طراحی **RTL** فارسی‌پسند
+- کاملاً **Responsive** (موبایل، تبلت، دسکتاپ)
+- آکاردئون‌های نرم و انیمیشن‌دار
+- Toast notification
+- Error Boundary (جلوگیری از صفحه سفید)
+- ScrollToTop (اسکرول به بالا هنگام تغییر مسیر)
+
+### 📝 بلاگ و محتوا
+- لیست پست‌ها با فیلتر و جستجو
+- صفحه پست با نظرات و مطالب مرتبط
+- درباره ما، تماس با ما، سوالات متداول
+- SEO با `react-helmet-async`
+
+---
+
+## 🛠️ تکنولوژی‌ها
+
+| دسته | تکنولوژی |
+|------|----------|
+| **فرانت‌اند** | React 19, Vite 8, React Router 7 |
+| **استایل** | Bootstrap 5, CSS سفارشی |
+| **بک‌اند** | Supabase (PostgreSQL, Auth, API) |
+| **State** | React Context + Hooks |
+| **اسلایدر** | Swiper 14 |
+| **SEO** | React Helmet Async |
+| **آیکون** | SVG سفارشی |
+
+---
+
+## 📦 نصب و راه‌اندازی
+
+### پیش‌نیازها
+- Node.js 18+
+- npm 9+
+- حساب [Supabase](https://supabase.com)
+
+### ۱. کلون پروژه
+```bash
+git clone https://github.com/yakoobkhedri/segal-react.git
+cd segal-react

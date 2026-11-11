@@ -1,8 +1,10 @@
 // src/components/layout/SearchSuggestions.jsx
 import { Link } from 'react-router-dom';
-import { products } from '../../data/products';
+import { useProducts } from '../../hooks/useProducts';
+
 
 export default function SearchSuggestions({ query, onSelect }) {
+  const { products } = useProducts();
   if (!query.trim()) return null;
 
   const suggestions = products

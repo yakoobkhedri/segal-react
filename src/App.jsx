@@ -1,6 +1,11 @@
+import { useEffect } from 'react';
+import { supabase } from './lib/supabaseClient';
+import ScrollToTop from './components/ScrollToTop';
+
 // src/App.jsx
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Contextها
 import { CartProvider } from './context/CartContext';
@@ -59,6 +64,19 @@ function LoadingFallback() {
 }
 
 export default function App() {
+
+  // داخل کامپوننت App:
+  useEffect(() => {
+    const testConnection = async () => {
+      const { data, error } = await supabase.from('products').select('*').limit(1);
+      if (error) {
+        console.error('❌ خطای اتصال:', error.message);
+      } else {
+        console.log('✅ اتصال موفق! داده:', data);
+      }
+    };
+    testConnection();
+  }, []);
   return (
     <ToastProvider>
       <AuthProvider>
@@ -68,88 +86,91 @@ export default function App() {
               <WishlistProvider>
                 <CompareProvider>
                   <SearchProvider>
-                    <Suspense fallback={<LoadingFallback />}>
-                      <Routes>
-                        {/* ✅ مسیرهای بدون Layout (بدون Header و Footer) */}
-                        <Route path="/login" element={<Login />} />
-                        
-                        <Route element={<Layout />}>
-                          {/* ✅ صفحات عمومی */}
-                          <Route path="/" element={<Home />} />
-                          <Route path="/products" element={<Products />} />
-                          <Route path="/product/:id" element={<SingleProduct />} />
-                          <Route path="/about" element={<About />} />
-                          <Route path="/contact" element={<Contact />} />
-                          <Route path="/faq" element={<FAQ />} />
-                          <Route path="/vitrin" element={<Vitrin />} />
-                          <Route path="/services" element={<Services />} />
-                          <Route path="/blog" element={<Blog />} />
-                          <Route path="/blog/:id" element={<SingleBlog />} />
-                          <Route path="/cart" element={<Cart />} />
-                          <Route path="/compare" element={<Compare />} />
+                    <ErrorBoundary>
+                      <ScrollToTop />
+                      <Suspense fallback={<LoadingFallback />}>
+                        <Routes>
+                          {/* ✅ مسیرهای بدون Layout (بدون Header و Footer) */}
+                          <Route path="/login" element={<Login />} />
 
-                          {/* 🔒 صفحات محافظت‌شده */}
-                          <Route
-                            path="/profile"
-                            element={
-                              <ProtectedRoute>
-                                <Profile />
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/profile/info"
-                            element={
-                              <ProtectedRoute>
-                                <ProfileInfo />
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/profile/addresses"
-                            element={
-                              <ProtectedRoute>
-                                <ProfileAddresses />
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/profile/history"
-                            element={
-                              <ProtectedRoute>
-                                <ProfileHistory />
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/profile/saved"
-                            element={
-                              <ProtectedRoute>
-                                <SavedProducts />
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/orders"
-                            element={
-                              <ProtectedRoute>
-                                <MyOrders />
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route
-                            path="/checkout"
-                            element={
-                              <ProtectedRoute>
-                                <Checkout />
-                              </ProtectedRoute>
-                            }
-                          />
-                          {/* 🚫 404 */}
-                          <Route path="*" element={<NotFound />} />
-                        </Route>
-                      </Routes>
-                    </Suspense>
+                          <Route element={<Layout />}>
+                            {/* ✅ صفحات عمومی */}
+                            <Route path="/" element={<Home />} />
+                            <Route path="/products" element={<Products />} />
+                            <Route path="/product/:id" element={<SingleProduct />} />
+                            <Route path="/about" element={<About />} />
+                            <Route path="/contact" element={<Contact />} />
+                            <Route path="/faq" element={<FAQ />} />
+                            <Route path="/vitrin" element={<Vitrin />} />
+                            <Route path="/services" element={<Services />} />
+                            <Route path="/blog" element={<Blog />} />
+                            <Route path="/blog/:id" element={<SingleBlog />} />
+                            <Route path="/cart" element={<Cart />} />
+                            <Route path="/compare" element={<Compare />} />
+
+                            {/* 🔒 صفحات محافظت‌شده */}
+                            <Route
+                              path="/profile"
+                              element={
+                                <ProtectedRoute>
+                                  <Profile />
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/profile/info"
+                              element={
+                                <ProtectedRoute>
+                                  <ProfileInfo />
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/profile/addresses"
+                              element={
+                                <ProtectedRoute>
+                                  <ProfileAddresses />
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/profile/history"
+                              element={
+                                <ProtectedRoute>
+                                  <ProfileHistory />
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/profile/saved"
+                              element={
+                                <ProtectedRoute>
+                                  <SavedProducts />
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/orders"
+                              element={
+                                <ProtectedRoute>
+                                  <MyOrders />
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
+                              path="/checkout"
+                              element={
+                                <ProtectedRoute>
+                                  <Checkout />
+                                </ProtectedRoute>
+                              }
+                            />
+                            {/* 🚫 404 */}
+                            <Route path="*" element={<NotFound />} />
+                          </Route>
+                        </Routes>
+                      </Suspense>
+                    </ErrorBoundary>
                   </SearchProvider>
                 </CompareProvider>
               </WishlistProvider>

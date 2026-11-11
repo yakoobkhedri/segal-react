@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  // ورود
+  // ورود ساده
   const login = useCallback((userData) => {
     setUser({
       id: userData.id || Date.now(),
@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  // به‌روزرسانی اطلاعات کاربر (جدید)
+  // به‌روزرسانی اطلاعات کاربر
   const updateUser = useCallback((updates) => {
     setUser((prev) => {
       if (!prev) return prev;
@@ -52,7 +52,6 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
-  // بررسی وضعیت
   const isLoggedIn = !!user;
 
   const value = useMemo(

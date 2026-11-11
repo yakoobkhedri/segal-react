@@ -23,11 +23,10 @@ function OrderCard({ order }) {
         </div>
         <div className="d-flex align-items-center gap-2">
           <p className="fs-14 text-gray mb-0">{order.date}</p>
-          <div className={`fs-11 rounded-pill py-1 px-3 text-white fw-300 ${
-            order.status === 'تکمیل شده' ? 'bg-second2'
+          <div className={`fs-11 rounded-pill py-1 px-3 text-white fw-300 ${order.status === 'تکمیل شده' ? 'bg-second2'
               : order.status === 'لغو شده' ? 'bg-danger'
-              : 'bg-gray4'
-          }`}>
+                : 'bg-gray4'
+            }`}>
             {order.status}
           </div>
         </div>
@@ -99,7 +98,28 @@ function OrderCard({ order }) {
 }
 
 export default function MyOrders() {
-  const { orders } = useOrders();
+  const { orders, loading, error } = useOrders();
+
+  if (loading) {
+    return (
+      <main className="mt-4">
+        <div className="container text-center py-5">
+          <div className="spinner-border text-main"></div>
+          <p className="mt-3">در حال بارگذاری سفارشات...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="mt-4">
+        <div className="container text-center py-5">
+          <p className="text-danger">خطا: {error}</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="mt-4 pb-5 mb-5">
